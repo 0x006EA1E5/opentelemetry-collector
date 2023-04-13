@@ -94,6 +94,9 @@ type LogsConfig struct {
 	//
 	// By default, there is no initial field.
 	InitialFields map[string]any `mapstructure:"initial_fields"`
+
+	// Optional zapcore.EncoderConfig values to pass to zap.Config
+	EncoderConfig LogsEncoderConfig `mapstructure:"encoder_config"`
 }
 
 // LogsSamplingConfig sets a sampling strategy for the logger. Sampling caps the
@@ -102,6 +105,24 @@ type LogsConfig struct {
 type LogsSamplingConfig struct {
 	Initial    int `mapstructure:"initial"`
 	Thereafter int `mapstructure:"thereafter"`
+}
+
+// LogsEncoderConfig passes trhough any set values to zapcore.EncoderConfig
+type LogsEncoderConfig struct {
+	// Set the keys used for each log entry. If any key is empty, that portion
+	// of the entry is omitted.
+	MessageKey    *string `mapstructure:"message_key"`
+	LevelKey      *string `mapstructure:"level_key"`
+	TimeKey       *string `mapstructure:"time_key"`
+	NameKey       *string `mapstructure:"name_key"`
+	CallerKey     *string `mapstructure:"caller_key"`
+	FunctionKey   *string `mapstructure:"function_key"`
+	StacktraceKey *string `mapstructure:"stacktrace_key"`
+
+	SkipLineEnding *bool   `mapstructure:"skip_line_ending"`
+	LineEnding     *string `mapstructure:"line_ending"`
+	// Configures the field separator used by the console encoder
+	ConsoleSeparator *string `mapstructure:"console_separator"`
 }
 
 // MetricsConfig exposes the common Telemetry configuration for one component.

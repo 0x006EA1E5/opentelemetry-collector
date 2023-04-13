@@ -72,7 +72,7 @@ func newLogger(cfg LogsConfig, options []zap.Option) (*zap.Logger, error) {
 		Development:       cfg.Development,
 		Sampling:          toSamplingConfig(cfg.Sampling),
 		Encoding:          cfg.Encoding,
-		EncoderConfig:     zap.NewProductionEncoderConfig(),
+		EncoderConfig:     toEncoderConfig(cfg.EncoderConfig),
 		OutputPaths:       cfg.OutputPaths,
 		ErrorOutputPaths:  cfg.ErrorOutputPaths,
 		DisableCaller:     cfg.DisableCaller,
@@ -101,4 +101,40 @@ func toSamplingConfig(sc *LogsSamplingConfig) *zap.SamplingConfig {
 		Initial:    sc.Initial,
 		Thereafter: sc.Thereafter,
 	}
+}
+
+func toEncoderConfig(ec LogsEncoderConfig) zapcore.EncoderConfig {
+	config := zap.NewProductionEncoderConfig()
+	if ec.SkipLineEnding != nil {
+		config.SkipLineEnding = *ec.SkipLineEnding
+	}
+	if ec.MessageKey != nil {
+		config.MessageKey = *ec.MessageKey
+	}
+	if ec.LevelKey != nil {
+		config.LevelKey = *ec.LevelKey
+	}
+	if ec.TimeKey != nil {
+		config.TimeKey = *ec.TimeKey
+	}
+	if ec.NameKey != nil {
+		config.NameKey = *ec.NameKey
+	}
+	if ec.CallerKey != nil {
+		config.CallerKey = *ec.CallerKey
+	}
+	if ec.FunctionKey != nil {
+		config.FunctionKey = *ec.FunctionKey
+	}
+	if ec.StacktraceKey != nil {
+		config.StacktraceKey = *ec.StacktraceKey
+	}
+	if ec.LineEnding != nil {
+		config.LineEnding = *ec.LineEnding
+	}
+	if ec.ConsoleSeparator != nil {
+		config.ConsoleSeparator = *ec.ConsoleSeparator
+	}
+
+	return config
 }
