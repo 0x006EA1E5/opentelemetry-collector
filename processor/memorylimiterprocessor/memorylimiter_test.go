@@ -5,6 +5,7 @@ package memorylimiterprocessor
 
 import (
 	"context"
+	"go.opentelemetry.io/collector/consumer/consumererror"
 	"runtime"
 	"testing"
 	"time"
@@ -215,7 +216,7 @@ func TestMetricsMemoryPressureResponse(t *testing.T) {
 			ml.memlimiter.CheckMemLimits()
 			err = mp.ConsumeMetrics(ctx, md)
 			if tt.expectError {
-				assert.Equal(t, memorylimiter.ErrDataRefused, err)
+				assert.Equal(t, consumererror.NewMetrics(memorylimiter.ErrDataRefused, md), err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -332,7 +333,7 @@ func TestTraceMemoryPressureResponse(t *testing.T) {
 			ml.memlimiter.CheckMemLimits()
 			err = tp.ConsumeTraces(ctx, td)
 			if tt.expectError {
-				assert.Equal(t, memorylimiter.ErrDataRefused, err)
+				assert.Equal(t, consumererror.NewTraces(memorylimiter.ErrDataRefused, td), err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -449,7 +450,7 @@ func TestLogMemoryPressureResponse(t *testing.T) {
 			ml.memlimiter.CheckMemLimits()
 			err = tp.ConsumeLogs(ctx, ld)
 			if tt.expectError {
-				assert.Equal(t, memorylimiter.ErrDataRefused, err)
+				assert.Equal(t, consumererror.NewLogs(memorylimiter.ErrDataRefused, ld), err)
 			} else {
 				assert.NoError(t, err)
 			}

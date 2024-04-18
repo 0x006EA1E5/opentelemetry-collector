@@ -5,8 +5,8 @@ package memorylimiterprocessor // import "go.opentelemetry.io/collector/processo
 
 import (
 	"context"
-
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/internal/memorylimiter"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/pdata/pmetric"
@@ -59,7 +59,7 @@ func (p *memoryLimiterProcessor) processTraces(ctx context.Context, td ptrace.Tr
 		// 	assumes that the pipeline is properly configured and a receiver is on the
 		// 	callstack and that the receiver will correctly retry the refused data again.
 		p.obsrep.TracesRefused(ctx, numSpans)
-		return td, memorylimiter.ErrDataRefused
+		return td, consumererror.NewTraces(memorylimiter.ErrDataRefused, td)
 	}
 
 	// Even if the next consumer returns error record the data as accepted by
@@ -77,7 +77,7 @@ func (p *memoryLimiterProcessor) processMetrics(ctx context.Context, md pmetric.
 		// 	assumes that the pipeline is properly configured and a receiver is on the
 		// 	callstack.
 		p.obsrep.MetricsRefused(ctx, numDataPoints)
-		return md, memorylimiter.ErrDataRefused
+		return md, consumererror.NewMetrics(memorylimiter.ErrDataRefused, md)
 	}
 
 	// Even if the next consumer returns error record the data as accepted by
@@ -95,7 +95,7 @@ func (p *memoryLimiterProcessor) processLogs(ctx context.Context, ld plog.Logs) 
 		// 	assumes that the pipeline is properly configured and a receiver is on the
 		// 	callstack.
 		p.obsrep.LogsRefused(ctx, numRecords)
-		return ld, memorylimiter.ErrDataRefused
+		return ld, consumererror.NewLogs(memorylimiter.ErrDataRefused, ld);
 	}
 
 	// Even if the next consumer returns error record the data as accepted by
